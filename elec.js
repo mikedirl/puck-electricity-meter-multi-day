@@ -1,5 +1,6 @@
+const DATE_OPTIONS = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
 const COST_PER_KWH = 0.47
-const COST_PER_PULSE = 1000/COST_PER_KWH;
+const COST_PER_PULSE = COST_PER_KWH / 1000;
 const DISPLAY_WIDTH = 800;
 const DAY_WIDTH = 750;
 const DAY_HEIGHT = 250;
@@ -79,18 +80,24 @@ function drawGraph(data) {
     ctx.stroke();
 }
 
-function drawDay(data) {
+function drawDay(date, data) {
     ctx.beginPath();
     ctx.rect(LEFT_BORDER, topPos, DAY_WIDTH, DAY_HEIGHT);
     ctx.stroke();
 
+    let accm = 0;
+
+    for(let i=0; i<data.length; i++) {
+        accm += data[i];
+    }
+    
     //Date Label
     ctx.font = "bold 18px Arial";
     ctx.fillText("Date:", LEFT_BORDER + 5, topPos + 20);
 
     //Date Text
     ctx.font = "18px Arial";
-    ctx.fillText("Monday, Jan 2nd 2022", LEFT_BORDER + 55, topPos + 20);
+    ctx.fillText(date.toLocaleDateString("en-US", DATE_OPTIONS), LEFT_BORDER + 55, topPos + 20);
 
     
     //Counts Label
@@ -99,7 +106,7 @@ function drawDay(data) {
 
     //Counts Text
     ctx.font = "18px Arial";
-    ctx.fillText("2001", LEFT_BORDER + 365, topPos + 20);
+    ctx.fillText(accm, LEFT_BORDER + 365, topPos + 20);
 
     //Est cost Label
     ctx.font = "bold 18px Arial";
@@ -107,7 +114,8 @@ function drawDay(data) {
 
     //Est Cost Text
     ctx.font = "18px Arial";
-    ctx.fillText("222 €", LEFT_BORDER + 585, topPos + 20);
+    ctx.fillText( Math.round( (accm * COST_PER_PULSE) * 100 + Number.EPSILON ) / 100
+     + "€", LEFT_BORDER + 585, topPos + 20);
 
     drawGraph(data);
 
@@ -122,14 +130,27 @@ function generateRandomData() {
     return data;
 }
 
+
+
+var today  = new Date();
+
+
 drawBatteryLevel();
-drawDay(generateRandomData());
-drawDay(generateRandomData());
-drawDay(generateRandomData());
-drawDay(generateRandomData());
-drawDay(generateRandomData());
-drawDay(generateRandomData());
-drawDay(generateRandomData());
-drawDay(generateRandomData());
-drawDay(generateRandomData());
-drawDay(generateRandomData());
+
+var today  = new Date();
+drawDay(today, generateRandomData());
+drawDay(today,generateRandomData());
+drawDay(today,generateRandomData());
+drawDay(today,generateRandomData());
+drawDay(today,generateRandomData());
+drawDay(today,generateRandomData());
+drawDay(today,generateRandomData());
+drawDay(today,generateRandomData());
+drawDay(today,generateRandomData());
+drawDay(today,generateRandomData());
+
+
+
+const now = new Date()  
+const secondsSinceEpoch = Math.round(now.getTime() / 1000)
+console.log(secondsSinceEpoch)
