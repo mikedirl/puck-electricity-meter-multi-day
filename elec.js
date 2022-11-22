@@ -30,7 +30,7 @@ function drawBatteryLevel() {
 
     //Battery Text
     ctx.font = "18px Arial";
-    ctx.fillText("100%", LEFT_BORDER + 75, topPos + 15);
+    ctx.fillText(batteryValue + "%", LEFT_BORDER + 75, topPos + 15);
 
     topPos += 30
 }
@@ -157,12 +157,12 @@ function render() {
 }
 
 function connectToPuck() {
-    Puck.connect(function (connection) {
-        if (connection === null) {
-            alert("Connection failed!");
-            return;
-        }
-    });
+    // Puck.connect(function (connection) {
+    //     if (connection === null) {
+    //         alert("Connection failed!");
+    //         return;
+    //     }
+    // });
 
     Puck.eval("{bat:E.getBattery()}", function (d, err) {
         if (!d) {
