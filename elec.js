@@ -2,6 +2,8 @@ const DATE_OPTIONS = { weekday: 'long', year: 'numeric', month: 'short', day: 'n
 const COST_PER_KWH = 0.47
 const COST_PER_PULSE = COST_PER_KWH / 1000;
 const DISPLAY_WIDTH = 800;
+const SLOTS_PER_DAY = 288;
+const DAYS_TO_KEEP = 7;
 const DAY_WIDTH = 750;
 const DAY_HEIGHT = 250;
 
@@ -12,6 +14,10 @@ const VERT_SPACING = 20;
 const LEFT_BORDER = (DISPLAY_WIDTH - DAY_WIDTH) / 2;
 const c = document.getElementById("drawcanvas");
 const ctx = c.getContext("2d");
+
+const data = [
+
+]
 
 function drawStuff() {
 
@@ -133,10 +139,19 @@ function generateRandomData() {
 
 
 function render() {
-    var today = new Date();
+    topPos = 10;
+    ctx.clearRect(0, 0, DISPLAY_WIDTH, 1000);
 
     drawBatteryLevel();
 
+    for(let i=0; i < data.length; i++) {
+        const epocDate = data[i].day*8.64e7;
+        //console.log('epocDate', epocDate);
+        drawDay(new Date(epocDate), data[i].data);
+    }
+
+
+    /*
     var today = new Date();
     drawDay(today, generateRandomData());
     drawDay(today, generateRandomData());
@@ -148,22 +163,23 @@ function render() {
     drawDay(today, generateRandomData());
     drawDay(today, generateRandomData());
     drawDay(today, generateRandomData());
-
-
-
+*/
     // const now = new Date()
     // const secondsSinceEpoch = Math.round(now.getTime() / 1000)
     // console.log(secondsSinceEpoch);
 }
 
-function connectToPuck() {
-    // Puck.connect(function (connection) {
-    //     if (connection === null) {
-    //         alert("Connection failed!");
-    //         return;
-    //     }
-    // });
+function showGraphs() {
+    document.getElementById("connectButton").style.visibility = "hidden";
+    document.getElementById("drawcanvas").style.visibility = "visible";
 
+    const connectButton = document.getElementById("connectButton");
+    connectButton.remove();
+    document.getElementById("drawcanvas").style.visibility = "visible";
+    render();
+}
+
+function connectToPuck() {
     Puck.eval("{bat:E.getBattery()}", function (d, err) {
         if (!d) {
             alert("Web Bluetooth connection failed!\n" + (err || ""));
@@ -172,13 +188,60 @@ function connectToPuck() {
 
         batteryValue = d.bat;
 
-        document.getElementById("connectButton").style.visibility = "hidden";
-        document.getElementById("drawcanvas").style.visibility = "visible";
-
-        const connectButton = document.getElementById("connectButton");
-        connectButton.remove();
-        document.getElementById("drawcanvas").style.visibility = "visible";
-        render();
+        Puck.eval("c.data", function(d,err) {
+            data = d;
+            showGraphs();
+        });  
     });
     
+    //showGraphs();
 };
+
+
+
+function getDayObject(daysSinceEpoc) {
+    for(let i=0; i < data.length; i++) {
+        if(data[i].day === daysSinceEpoc) {
+            return data[i];
+        }
+    }
+
+
+    const newDataForToday = {
+        day: daysSinceEpoc,
+        data: new Uint8Array(288)
+    };
+
+    data.unshift(newDataForToday);
+
+    if(data[data.length-1].day > daysSinceEpoc + DAYS_TO_KEEP) {
+        data.pop();
+    }
+
+    return newDataForToday;
+}
+
+function addPulse() {
+
+    const now = new Date();
+    const daysSinceEpoc = Math.floor(now/8.64e7);
+    const nowSeconds = now.getTime() / 1000;
+    const startOfdayTime = new Date();
+    startOfdayTime.setHours(0);
+    startOfdayTime.setMinutes(0);
+    const startOfDaySeconds=startOfdayTime.getTime() / 1000;
+    const slot = Math.round((nowSeconds-startOfDaySeconds) / SLOTS_PER_DAY);
+
+    const dataForToday = getDayObject(daysSinceEpoc);
+    dataForToday.data[slot]+=1;
+    console.log(dataForToday, dataForToday.data[slot]);
+}
+
+
+function keepRunning() {
+    addPulse();
+    render();
+    setTimeout(keepRunning, Math.random() * 20000)
+  }
+  
+  keepRunning()
