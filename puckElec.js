@@ -5,6 +5,7 @@ const DAYS_TO_KEEP = 7;
 function Counter() {
     this.clear();
 };
+
 /// Clear the counters back to zero
 Counter.prototype.clear = function () {
     this.data = [
@@ -45,18 +46,19 @@ Counter.prototype.inc = function () {
 
     const dataForToday = this.getDayObject(daysSinceEpoc);
     dataForToday.data[slot]+=1;
-    // console.log(dataForToday, dataForToday.data[slot]);
+    console.log(dataForToday, dataForToday.data[slot]);
 };
 
 var c = new Counter();
 
 // Update BLE advertising
 function update() {
+  console.log('Update');
     var a = new ArrayBuffer(4);
     var d = new DataView(a);
     d.setUint32(0, c.data.length, false/*big endian*/);
     NRF.setAdvertising({}, {
-        name: "Puck.js \xE2\x9A\xA1",
+        name: "Puck.js Elec \xE2\x9A\xA1",
         manufacturer: 0x0590,
         manufacturerData: a,
         interval: 600 // default is 375 - save a bit of power
@@ -64,13 +66,17 @@ function update() {
 }
 
 function onInit() {
+  console.log('onInit');
     clearWatch();
     D1.write(0);
     pinMode(D2, "input_pullup");
     setWatch(function (e) {
+        console.log('hhhh');
         c.inc();
         update();
         // digitalPulse(LED1, 1, 1); // show activity
     }, D2, { repeat: true, edge: "falling" });
     update();
 }
+
+onInit();
