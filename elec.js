@@ -189,6 +189,9 @@ function connectToPuck() {
         batteryValue = d.bat;
 
         Puck.eval("c.data", function(d,err) {
+            if(err) {
+                alert(err);
+            }
             data = d;
             showGraphs();
         });  
