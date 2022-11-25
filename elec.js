@@ -15,7 +15,7 @@ const LEFT_BORDER = (DISPLAY_WIDTH - DAY_WIDTH) / 2;
 const c = document.getElementById("drawcanvas");
 const ctx = c.getContext("2d");
 
-const data = [
+let data = [
 
 ]
 
@@ -192,6 +192,7 @@ function connectToPuck() {
             if(err) {
                 alert(err);
             }
+            console.log('date', d);
             data = d;
             showGraphs();
         });  
@@ -241,10 +242,10 @@ function addPulse() {
 }
 
 
-function keepRunning() {
-    addPulse();
-    render();
-    setTimeout(keepRunning, Math.random() * 20000)
-  }
+// function keepRunning() {
+//     addPulse();
+//     render();
+//     setTimeout(keepRunning, Math.random() * 20000)
+//   }
   
-  keepRunning()
+//   keepRunning()
