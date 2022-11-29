@@ -1,6 +1,6 @@
 const DATE_OPTIONS = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
 const COST_PER_KWH = 0.47
-const COST_PER_PULSE = COST_PER_KWH / 1000;
+const COST_PER_PULSE = COST_PER_KWH / 300;
 const DISPLAY_WIDTH = 800;
 const SLOTS_PER_DAY = 288;
 const DAYS_TO_KEEP = 7;
