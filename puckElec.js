@@ -75,7 +75,7 @@ function onInit() {
         c.inc();
         update();
         // digitalPulse(LED1, 1, 1); // show activity
-    }, D2, { repeat: true, edge: "falling" });
+    }, D2, { repeat: true, edge: "falling", hispeed : true });
     update();
 }
 
